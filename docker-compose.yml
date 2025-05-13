@@ -1,28 +1,45 @@
 version: "3.9"
 services:
+  app:
+    container_name: app-geo
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    restart: unless-stopped
+    volumes:
+      - ./src:/application/src
+    ports:
+      - 8080:8080
+    networks:
+      - reverse-geo
+    depends_on:
+      - database
+      - redis
+
   database:
     image: postgres:17
     container_name: db-geo
-    restart: always
+    restart: unless-stopped
     ports:
       - 5432:5432
     environment:
-      POSTGRES_DB: lele_terbang
-      POSTGRES_USER: postgre
+      POSTGRES_DB: database_geo
+      POSTGRES_USER: user
       POSTGRES_PASSWORD: password
     networks:
       - reverse-geo
     volumes:
-      - ${PWD}/tmp/postgres-data:/var/lib/postgresql/data
+      - data-reverse-geo:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgre"]
+      test: ["CMD-SHELL", "pg_isready -U user -d database_geo"]
       interval: 5s
       timeout: 3s
       retries: 3
 
   redis:
-    container_name: redis-lele
-    image: redis/redis-stack:latest
+    container_name: redis
+    image: redis:8.0.0-alpine # or 8.0.0
+    restart: unless-stopped
     ports:
       - "6379:6379"
       - "8001:8001"
@@ -39,4 +56,4 @@ networks:
     driver: bridge
 
 volumes:
-  data-lele:
+  data-reverse-geo:
