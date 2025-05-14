@@ -1,6 +1,13 @@
-# 🇮🇩 Reverse Geocode Indonesia
 
-**Currently supports only Indonesia**
+<div align="center">
+<!-- image logo -->
+<img src="assets/logo.png" alt="Reverse Geocode Logo" width="150"/>
+
+# Reverse Geocode
+
+<br>
+
+**Currently only show data from Indonesia**
 
 Reverse Geocode Indonesia is an API that takes latitude and longitude as input and returns the corresponding address in Indonesia (Kecamatan/District, Kabupaten/Regency, Provinsi/Province, and Country).
 We built this because sometimes you need to geocode `at high speed (> 1 req/second)` for Indonesian locations.
