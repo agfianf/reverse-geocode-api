@@ -13,7 +13,7 @@ help: ## Show this help message
 
 # Environment setup with `uv` ==========================================
 install: ## Install dependencies with uv
-	uv sync
+	uv sync --all-extras --all-groups
 
 sync-all: ## Sync all dependencies
 	uv sync --all-extras
@@ -41,7 +41,13 @@ build: ## Build Docker app (backend) images
 	-t $(DOCKER_IMAGE) .
 
 build-compose: ## Build Docker Compose images
+	@echo "VERSION is $(VERSION)"
+	@echo "Building Docker Compose images with tags $(DOCKER_IMAGE)"
+	DOCKER_IMAGE=$(DOCKER_IMAGE) \
+	USER_UID=$$(id -u) \
+	USER_GID=$$(id -g) \
 	docker-compose build
+	docker-compose pull
 
 up: ## Start Docker containers
 	docker-compose up -d

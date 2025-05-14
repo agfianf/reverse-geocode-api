@@ -5,19 +5,24 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.dev
+      args:
+        USER_UID: ${USER_UID:-1000}
+        USER_GID: ${USER_GID:-1000}
+    image: ${DOCKER_IMAGE}
     restart: unless-stopped
     volumes:
       - ./src:/application/src
     ports:
       - 8080:8080
-    networks:
-      - reverse-geo
     depends_on:
       - database
       - redis
+    networks:
+      - reverse-geo
 
   database:
-    image: postgres:17
+    platform: "linux/${ARCH:-amd64}"
+    image: postgis/postgis:17-master
     container_name: db-geo
     restart: unless-stopped
     ports:

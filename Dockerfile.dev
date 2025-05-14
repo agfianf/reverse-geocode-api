@@ -11,7 +11,7 @@ WORKDIR /application
 # Install the application dependencies.
 RUN --mount=type=bind,source=uv.lock,target=uv.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
-    uv sync --all-groups --frozen --no-cache 
+    uv sync --all-groups --frozen
 
 ARG USER_UID=1000
 ARG USER_GID=1000
@@ -25,4 +25,4 @@ ENV PYTHONPATH=/application/src
 
 WORKDIR /application/src
 
-CMD ["uv","run", "src/main.py"]
+CMD ["uv","run", "app/main.py"]

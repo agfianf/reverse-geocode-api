@@ -36,5 +36,9 @@ class Settings(BaseSettings):
 
     WHITELIST_CLIENT_IDS: str
 
+    def get_whitelist_client_ids(self) -> list[str]:
+        return self.WHITELIST_CLIENT_IDS.split(",") if self.WHITELIST_CLIENT_IDS else []
+
 
 settings: Final[Settings] = Settings()
+DATABASE_URL: Final = f"postgresql+psycopg://{settings.POSTGRE_USER}:{settings.POSTGRE_PASSWORD}@{settings.POSTGRE_HOST}:{settings.POSTGRE_PORT}/{settings.POSTGRE_DB}"
