@@ -1,7 +1,6 @@
-
 <div align="center">
 <!-- image logo -->
-<img src="assets/logo.png" alt="Reverse Geocode Logo" width="150"/>
+<img src="assets/logo-white.png" alt="Reverse Geocode Logo" width="150" style="border-radius: 10%; box-shadow: 0 4px 16px rgba(0,0,0,0.15);" />
 
 # Reverse Geocode
 
