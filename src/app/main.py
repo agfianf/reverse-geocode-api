@@ -17,8 +17,6 @@ async def lifespan(app: FastAPI):  # noqa
     # cleanup
 
 
-app = FastAPI(lifespan=lifespan)
-
 app = FastAPI(
     title=settings.APP_NAME,
     version=f"{settings.APP_VERSION}",

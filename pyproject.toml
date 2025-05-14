@@ -13,7 +13,7 @@ dependencies = [
     "sqlalchemy==2.0.40",
     "uvicorn==0.34.2",
     "qrcode==8.2",
-    "psycopg[binary,pool]==3.2.8",
+    "psycopg[binary,pool]==3.2.9",
     "alembic==1.15.2",
     "argon2-cffi==23.1.0",
     "uuid-utils==0.10.0",
@@ -22,9 +22,9 @@ dependencies = [
     "structlog==25.3.0",
     "passlib==1.7.4",
     "redis==6.1.0",
-    "geoalchemy2>=0.17.1",
-    "shapely>=2.1.0",
-    "pydantic-extra-types>=2.10.4",
+    "geoalchemy2==0.17.1",
+    "shapely==2.1.0",
+    "pydantic-extra-types==2.10.4",
 ]
 
 [dependency-groups]
