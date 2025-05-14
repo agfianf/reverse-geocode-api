@@ -3,7 +3,7 @@
 **Currently supports only Indonesia**
 
 Reverse Geocode Indonesia is an API that takes latitude and longitude as input and returns the corresponding address in Indonesia (Kecamatan/District, Kabupaten/Regency, Provinsi/Province, and Country).
-We built this because sometimes you need to geocode **at high speed** (> 1 req/second) for Indonesian locations.
+We built this because sometimes you need to geocode `at high speed (> 1 req/second)` for Indonesian locations.
 This API is not perfect, but it's fast and works well for most use cases! 🚀
 
 ---
@@ -33,9 +33,9 @@ To convert the shapefile to SQL, check out [`docs/database/convert.py`](docs/dat
 
 ---
 
-## ToDo
+## To Do
 
+- [x] Add caching
+- [ ] Add CI/CD
 - [ ] Add more tests
 - [ ] Add more documentation
-- [ ] Add caching
-- [ ] Add CI/CD
