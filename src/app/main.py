@@ -6,13 +6,20 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 
 from app.config import settings
+from app.middlewares.error_response import handle_error_response
+from app.repositories.reverse_geo import ReverseGeocodeRepositories
+from app.routers.reverse_geo import router as reverse_geo_router
+from app.services.reverse_geo import ReverseGeocodeService
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):  # noqa
     print("Initializing resources...")
-    # integration
-    yield
+    reverse_geo_repo = ReverseGeocodeRepositories()
+    reverse_geocode_service = ReverseGeocodeService(repo=reverse_geo_repo)
+    yield {
+        "reverse_geocode_service": reverse_geocode_service,
+    }
     print("Cleaning up resources...")
     # cleanup
 
@@ -42,8 +49,10 @@ async def health():
     return {"status": "ok"}
 
 
-# app.add_exception_handler(HTTPException, handle_error_response)
-# app.add_exception_handler(RequestValidationError, handle_error_response)
+app.add_exception_handler(HTTPException, handle_error_response)
+app.add_exception_handler(RequestValidationError, handle_error_response)
+
+app.include_router(reverse_geo_router)
 
 if __name__ == "__main__":
     import uvicorn

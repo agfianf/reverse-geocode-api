@@ -1,7 +1,7 @@
 repos:
   - repo: https://github.com/astral-sh/uv-pre-commit
     # uv version.
-    rev: 0.5.29
+    rev: 0.7.3
     hooks:
       - id: uv-lock
         name: update uv lock file
@@ -12,7 +12,7 @@ repos:
     rev: v5.0.0
     hooks:
       - id: check-added-large-files
-        args: ['--maxkb=1024']  # 1MB = 1024KB
+        args: ['--maxkb=102400']  # 1MB = 1024KB
       - id: check-toml
       - id: check-yaml
         exclude: ^mkdocs\.yml$

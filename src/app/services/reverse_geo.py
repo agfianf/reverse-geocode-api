@@ -1,11 +1,10 @@
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.ext.asyncio import AsyncConnection
 
 from app.repositories.reverse_geo import ReverseGeocodeRepositories
-from app.schemas.common import (
+from app.schemas.reverse_geo import (
     AddressLocation,
-    GetContainsLatLong,
+    QueryParamsCoordinate,
 )
-from app.schemas.reverse_geo import QueryParamsCoordinate
 
 
 class ReverseGeocodeService:
@@ -17,16 +16,10 @@ class ReverseGeocodeService:
     async def reverse_geocode(
         self,
         payload: QueryParamsCoordinate,
-        session: AsyncSession,
+        connection: AsyncConnection,
     ) -> AddressLocation:
         result = await self.repo.get_contains_lat_long(
             payload=payload,
-            session=session,
+            connection=connection,
         )
-        return AddressLocation(
-            sub_district=result.village,
-            district=result.district,
-            regency_city=result.regency_city,
-            province=result.province,
-            country=result.country,
-        )
+        return result
