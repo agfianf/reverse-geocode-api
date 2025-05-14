@@ -35,6 +35,7 @@ class Settings(BaseSettings):
     REDIS_PORT: int
 
     WHITELIST_CLIENT_IDS: str
+    SECRET_KEY: str
 
     def get_whitelist_client_ids(self) -> list[str]:
         return self.WHITELIST_CLIENT_IDS.split(",") if self.WHITELIST_CLIENT_IDS else []
