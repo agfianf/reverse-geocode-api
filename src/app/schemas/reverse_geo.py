@@ -18,8 +18,6 @@ class AddressLocation(BaseModel):
         None, description="Sub-district or village of the address."
     )
     district: str | None = Field(None, description="District of the address.")
-    regency_city: str | None = Field(
-        None, description="Regency or city of the address."
-    )
+    regency_city: str | None = Field(None, description="Regency or city of the address.")
     province: str | None = Field(None, description="Province of the address.")
     country: str | None = Field(None, description="Country of the address.")

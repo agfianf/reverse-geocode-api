@@ -51,7 +51,7 @@ ignore = [
 ]
 
 fixable = ["ALL"]
-unfixable = ["F401"]
+# unfixable = [""]
 
 
 [lint.per-file-ignores]

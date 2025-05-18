@@ -27,9 +27,9 @@ repos:
     hooks:
       - id: ruff
         types_or: [python, pyi, jupyter]
-        args: ["--config","pyproject.toml", "--fix"]
+        args: ["--config","ruff.toml", "--fix"]
       - id: ruff-format
-        args: [--config=pyproject.toml]
+        args: ["--config","ruff.toml"]
         types_or: [python, pyi, jupyter]
 
   - repo: https://github.com/Lucas-C/pre-commit-hooks

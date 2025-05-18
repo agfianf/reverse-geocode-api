@@ -21,6 +21,13 @@ sync-all: ## Sync all dependencies
 sync-docs:
 	uv sync --only-group={docs,dev}
 
+# Formatting and linting ================================================
+lint: ## Run linters
+	uv run ruff check --fix --config=ruff.toml
+
+format: ## Format code
+	uv run ruff format --config=ruff.toml
+
 # Docker tasks =========================================================
 run-docker-app: ## Run Docker app (backend) container
 	@echo "Running Docker image $(DOCKER_IMAGE)"
@@ -74,7 +81,10 @@ down-with-nginx: ## Stop and remove Docker containers
 # Development tasks ====================================================
 .PHONY: test
 test: ## Run tests
-	uv run pytest src/tests
+	uv run pytest
+
+# uv run pytest --cov-report=term-missing --cov=src/app src/tests/
+# uv run coverage report --fail-under=30
 
 .PHONY: pre-commit
 pre-commit: ## Run pre-commit hooks

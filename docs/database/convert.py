@@ -14,12 +14,12 @@ gdf = gpd.read_file("Batas_Wilayah_KelurahanDesa_10K_AR.shp")
 
 # Select and rename only the relevant columns for the database schema
 selected_columns = {
-    "SRS_ID": "srs_id",           # Spatial Reference System Identifier
-    "WADMKC": "district",         # District/Kecamatan name
-    "WADMKD": "village",          # Village/Desa name
-    "WADMKK": "regency_city",     # Regency/City (Kabupaten/Kota) name
-    "WADMPR": "province",         # Province name
-    "geometry": "geom",           # Geometry column
+    "SRS_ID": "srs_id",  # Spatial Reference System Identifier
+    "WADMKC": "district",  # District/Kecamatan name
+    "WADMKD": "village",  # Village/Desa name
+    "WADMKK": "regency_city",  # Regency/City (Kabupaten/Kota) name
+    "WADMPR": "province",  # Province name
+    "geometry": "geom",  # Geometry column
 }
 gdf = gdf[list(selected_columns.keys())].rename(columns=selected_columns)
 
@@ -32,6 +32,7 @@ gdf.head()
 # Ensure the geometry column is set and convert all geometries to EPSG:4326 (WGS84)
 gdf = gdf.set_geometry("geom")
 gdf = gdf.to_crs(epsg=4326)
+
 
 # Function to convert any geometry to a valid 2D MULTIPOLYGON
 def to_multipolygon_2d(geom):
@@ -50,6 +51,7 @@ def to_multipolygon_2d(geom):
         return geom_2d
     # Return None for unsupported geometry types
     return None
+
 
 # Apply the conversion to all geometries in the GeoDataFrame
 gdf["geom"] = gdf["geom"].apply(to_multipolygon_2d)

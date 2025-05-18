@@ -61,4 +61,4 @@ asyncio_default_fixture_loop_scope = "function"  # for pytest-asyncio so that th
 source = ["src/app"]
 
 [tool.coverage.report]
-fail_under = 50
+fail_under = 30

@@ -1,0 +1,31 @@
+name: Build Docker Image
+on:
+  push:
+    tags:
+      - stg-v*
+      - prod-v*
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🐍 Install uv and set the python version
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
+          python-version: "3.12"
+
+      - name: 📦 Install the project
+        run: make sync-all
+
+      - name: 🔍 Checking linter
+        run: make lint
+
+      - name: 🔍 Checking Format
+        run: make format
+
+      - name: 📊 Run tests with Coverage
+        run: make test
