@@ -1,7 +1,7 @@
 # if tags are not found, fallback to version in pyproject.toml
 VERSION := $(shell git describe --tags --abbrev=0 2>/dev/null || cat pyproject.toml | awk '/version =/ {gsub(/"/, "", $$3); print $$3}')
 DOCKER_IMAGE = reverse-geo-api:$(VERSION)
-
+REDIS_PASSWORD = "your_redis_password"
 
 # Default target
 help: ## Show this help message
@@ -50,10 +50,26 @@ build-compose: ## Build Docker Compose images
 	docker-compose pull
 
 up: ## Start Docker containers
+	@echo "VERSION is $(VERSION)"
+	@echo "Building Docker Compose images with tags $(DOCKER_IMAGE)"
+	DOCKER_IMAGE=$(DOCKER_IMAGE) \
+	USER_UID=$$(id -u) \
+	USER_GID=$$(id -g) \
 	docker-compose up -d
+
+up-with-nginx: ## Start Docker containers with Nginx
+	@echo "Starting Docker containers with Nginx"
+	DOCKER_IMAGE=$(DOCKER_IMAGE) \
+	USER_UID=$$(id -u) \
+	USER_GID=$$(id -g) \
+	REDIS_PASSWORD=$(REDIS_PASSWORD) \
+	docker-compose -f docker-compose.nginx.yml up
 
 down: ## Stop and remove Docker containers
 	docker-compose down
+
+down-with-nginx: ## Stop and remove Docker containers
+	docker-compose -f docker-compose.nginx.yml down
 
 # Development tasks ====================================================
 .PHONY: test
@@ -63,6 +79,10 @@ test: ## Run tests
 .PHONY: pre-commit
 pre-commit: ## Run pre-commit hooks
 	uv run pre-commit run --all-files
+
+logs:
+	@echo "Showing logs for Docker containers"
+	docker-compose logs -f
 
 # Cleanup
 .PHONY: shell
