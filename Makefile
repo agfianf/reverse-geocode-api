@@ -63,7 +63,7 @@ up-with-nginx: ## Start Docker containers with Nginx
 	USER_UID=$$(id -u) \
 	USER_GID=$$(id -g) \
 	REDIS_PASSWORD=$(REDIS_PASSWORD) \
-	docker-compose -f docker-compose.nginx.yml up
+	docker-compose -f docker-compose.nginx.yml up -d
 
 down: ## Stop and remove Docker containers
 	docker-compose down

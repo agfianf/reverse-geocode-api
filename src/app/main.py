@@ -34,7 +34,8 @@ async def lifespan(app: FastAPI):  # noqa
 
 
 app = FastAPI(
-    title=settings.APP_NAME + hostname,
+    title=settings.APP_NAME,
+    description=f"{hostname=}",
     version=f"{settings.APP_VERSION}",
     lifespan=lifespan,
 )
@@ -55,7 +56,7 @@ async def root():  # noqa: ANN201
 
 @app.get("/health")
 async def health():
-    return {"status": "ok"}
+    return {"status": "ok", "hostname": hostname}
 
 
 app.add_exception_handler(HTTPException, handle_error_response)
