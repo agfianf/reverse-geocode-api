@@ -22,7 +22,7 @@ jobs:
           python-version: "3.12"
 
       - name: 📦 Install the project
-        run: make sync-all
+        run: make install
 
       - name: 🔍 Checking linter
         run: make lint
