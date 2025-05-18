@@ -4,6 +4,7 @@ on:
     tags:
       - stg-v*
       - prod-v*
+
 jobs:
   test:
     runs-on: ubuntu-latest
