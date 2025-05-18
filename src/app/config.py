@@ -33,6 +33,7 @@ class Settings(BaseSettings):
     # REDIS
     REDIS_HOST: str
     REDIS_PORT: int
+    REDIS_PASSWORD: str
 
     WHITELIST_CLIENT_IDS: str
     SECRET_KEY: str

@@ -1,3 +1,5 @@
+import socket
+
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, HTTPException
@@ -11,6 +13,9 @@ from app.middlewares.error_response import handle_error_response
 from app.repositories.reverse_geo import ReverseGeocodeRepositories
 from app.routers.reverse_geo import router as reverse_geo_router
 from app.services.reverse_geo import ReverseGeocodeService
+
+
+hostname = socket.gethostname()
 
 
 @asynccontextmanager
@@ -30,6 +35,7 @@ async def lifespan(app: FastAPI):  # noqa
 
 app = FastAPI(
     title=settings.APP_NAME,
+    description=f"{hostname=}",
     version=f"{settings.APP_VERSION}",
     lifespan=lifespan,
 )
@@ -50,7 +56,7 @@ async def root():  # noqa: ANN201
 
 @app.get("/health")
 async def health():
-    return {"status": "ok"}
+    return {"status": "ok", "hostname": hostname}
 
 
 app.add_exception_handler(HTTPException, handle_error_response)

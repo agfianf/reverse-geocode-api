@@ -1,6 +1,5 @@
 from geoalchemy2 import Geometry
 from sqlalchemy import Column, String, Table
-from sqlalchemy.dialects.postgresql import TSVECTOR
 
 from app.helpers.database import metadata
 

@@ -27,9 +27,7 @@ async def reverse_geocode(
     payload: Annotated[QueryParamsCoordinate, Query()],
     connection: Annotated[AsyncConnection, Depends(get_async_conn)],
 ) -> JsonResponse[AddressLocation, None]:
-    reverse_geocode_service: ReverseGeocodeService = (
-        request.state.reverse_geocode_service
-    )
+    reverse_geocode_service: ReverseGeocodeService = request.state.reverse_geocode_service
     response = await reverse_geocode_service.reverse_geocode(
         payload=payload,
         connection=connection,
