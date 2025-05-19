@@ -11,3 +11,4 @@ wheels/
 .env
 test.json
 .coverage
+.secret.aws.md
