@@ -57,8 +57,8 @@ jobs:
       - name: Build, tag, and push the image to Amazon ECR
         id: build-image
         env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: ${{ secrets.REPO_NAME }}
+          ECR_REGISTRY: ${{ secrets.IMAGE_REGISTRY }}
+          ECR_REPOSITORY: ${{ secrets.IMAGE_REPOSITORY }}
           IMAGE_TAG: ${{ github.ref_name }}
         run: |
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
@@ -67,16 +67,12 @@ jobs:
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@0.30.0
         with:
-          image-ref: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.REPO_NAME }}:${{ github.ref_name }}
+          image-ref: ${{ secrets.IMAGE_REGISTRY }}/${{ secrets.IMAGE_REPOSITORY }}:${{ github.ref_name }}
           format: 'table'
           exit-code: '0'
           ignore-unfixed: true
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
-    outputs:
-      ecr_registry: ${{ steps.login-ecr.outputs.registry }}
-      full_image_name:  ${{ steps.login-ecr.outputs.registry }}/${{ secrets.REPO_NAME }}:${{ github.ref_name }}
-
   deploy:
     name: Deploy to AWS ECS
     runs-on: ubuntu-latest
@@ -96,22 +92,21 @@ jobs:
             HOSTNAME: ${{ secrets.SSH_HOST }}
             USER_NAME: ${{ secrets.SSH_USER_NAME }}
             REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
-            ECR_REGISTRY: ${{ needs.build.outputs.ecr_registry }}
-            FULL_IMAGE_NAME: ${{ needs.build.outputs.full_image_name }}
+            FULL_IMAGE_NAME: ${{ secrets.IMAGE_REGISTRY }}/${{ secrets.IMAGE_REPOSITORY }}:${{ github.ref_name }}
         run: |
-          ssh -o StrictHostKeyChecking=no -i private_key ${USER_NAME}@${HOSTNAME} '
+          ssh -o StrictHostKeyChecking=no ${USER_NAME}@${HOSTNAME} '
             set -e
             # Check if project directory exists, clone if not
             if [ ! -d "${{ secrets.APP_PATH }}/.git" ]; then
-              git clone ${{ github.repositoryUrl }} ${{ secrets.APP_PATH }}
+              git clone https://github.com/${{ github.repository }}.git ${{ secrets.APP_PATH }}
             fi
             cd ${{ secrets.APP_PATH }}
             git fetch --all --tags
             git checkout ${{ github.ref_name }}
             git pull
             # Stop and remove running containers using the image
-            docker ps --filter "ancestor=$ECR_REGISTRY/${{ secrets.REPO_NAME }}" -q | xargs -r docker stop
-            docker ps -a --filter "ancestor=$ECR_REGISTRY/${{ secrets.REPO_NAME }}" -q | xargs -r docker rm
+            docker ps --filter "ancestor=$ECR_REGISTRY/${{ secrets.IMAGE_REPOSITORY }}" -q | xargs -r docker stop
+            docker ps -a --filter "ancestor=$ECR_REGISTRY/${{ secrets.IMAGE_REPOSITORY }}" -q | xargs -r docker rm
             # Pull latest changes
             git pull
             # Pull latest image
@@ -120,7 +115,7 @@ jobs:
             docker image prune -f
             # Set env vars and run docker-compose.nginx.yml via Makefile
             export DOCKER_IMAGE=$FULL_IMAGE_NAME
-            export REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}
+            export REDIS_PASSWORD=$REDIS_PASSWORD
             # Run docker-compose
             USER_UID=$$(id -u) USER_GID=$$(id -g) docker-compose -f docker-compose.nginx.yml up -d
           '
