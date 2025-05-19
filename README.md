@@ -67,7 +67,7 @@ make up-nginx
 
 ## [Deploy to AWS via Github Actions CI/CD](./docs/deployment.md)
 
-![image](./assets/deployment/overview.gif)
+![image](./assets/deployment/overview2.gif)
 
 [Readmore Here](./docs/deployment.md)
 
@@ -83,6 +83,8 @@ make up-nginx
 - 🐳 **Docker** & **Docker Compose** (containerization)
 - 🌐 **Nginx** (optional, for load balancing/reverse proxy)
 - 🧪 **Pytest**, **HTTPX** (testing)
+- 📦 **uv** as package man
+- 📦 **ruff** as package manager
 
 ---
 

@@ -69,7 +69,7 @@ The workflow consists of three main stages:
 
 ### Overview Diagram
 
-![image](../assets/deployment/overview.gif)
+![image](../assets/deployment/overview2.gif)
 
 
 ### Manual Verification Steps
