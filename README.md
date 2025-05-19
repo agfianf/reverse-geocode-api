@@ -83,8 +83,8 @@ make up-nginx
 - 🐳 **Docker** & **Docker Compose** (containerization)
 - 🌐 **Nginx** (optional, for load balancing/reverse proxy)
 - 🧪 **Pytest**, **HTTPX** (testing)
-- 📦 **uv** as package man
-- 📦 **ruff** as package manager
+- 📦 **uv** as package manager and depedencies
+- 📦 **ruff** as linter and formatter
 
 ---
 
