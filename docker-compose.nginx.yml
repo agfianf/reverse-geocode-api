@@ -9,8 +9,12 @@ services:
         USER_GID: ${USER_GID:-1000}
     image: ${DOCKER_IMAGE}
     restart: unless-stopped
-    # volumes:
-    #   - ./src:/application/src
+    env_file:
+      - src/app/.env
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-your_redis_password}
+      - APP_VERSION=${APP_VERSION:-latest}
+      - APP_ENV=${APP_ENV:-dev}
     depends_on:
       database:
         condition: service_healthy

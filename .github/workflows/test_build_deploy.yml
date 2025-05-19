@@ -94,6 +94,8 @@ jobs:
             REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
             FULL_IMAGE_NAME: ${{ secrets.IMAGE_REGISTRY }}/${{ secrets.IMAGE_REPOSITORY }}:${{ github.ref_name }}
             IMAGE_REPOSITORY: ${{ secrets.IMAGE_REGISTRY }}/${{ secrets.IMAGE_REPOSITORY }}
+            APP_VERSION: ${{ github.ref_name }}
+            APP_ENV: "staging"
         run: |
           ssh -o StrictHostKeyChecking=no ${USER_NAME}@${HOSTNAME} "
             set -e
@@ -115,6 +117,8 @@ jobs:
             # Set env vars and run docker-compose.nginx.yml via Makefile
             export DOCKER_IMAGE=${FULL_IMAGE_NAME}
             export REDIS_PASSWORD=${REDIS_PASSWORD}
+            export APP_VERSION=${APP_VERSION}
+            export APP_ENV=${APP_ENV}
             # Run docker-compose
             USER_UID=\$(id -u) USER_GID=\$(id -g) docker-compose -f docker-compose.nginx.yml up -d
           "
