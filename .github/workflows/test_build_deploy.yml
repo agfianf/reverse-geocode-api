@@ -116,5 +116,5 @@ jobs:
             export DOCKER_IMAGE=${FULL_IMAGE_NAME}
             export REDIS_PASSWORD=${REDIS_PASSWORD}
             # Run docker-compose
-            USER_UID=$(id -u) USER_GID=$(id -g) docker-compose -f docker-compose.nginx.yml up -d
+            USER_UID=\$(id -u) USER_GID=\$(id -g) docker-compose -f docker-compose.nginx.yml up -d
           '
