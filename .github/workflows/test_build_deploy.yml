@@ -93,6 +93,7 @@ jobs:
             USER_NAME: ${{ secrets.SSH_USER_NAME }}
             REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
             FULL_IMAGE_NAME: ${{ secrets.IMAGE_REGISTRY }}/${{ secrets.IMAGE_REPOSITORY }}:${{ github.ref_name }}
+            IMAGE_REPOSITORY: ${{ secrets.IMAGE_REGISTRY }}/${{ secrets.IMAGE_REPOSITORY }}
         run: |
           ssh -o StrictHostKeyChecking=no ${USER_NAME}@${HOSTNAME} '
             set -e
@@ -102,10 +103,10 @@ jobs:
             fi
             cd ${{ secrets.APP_PATH }}
             git fetch --all --tags
-            git checkout ${ github.ref_name }
+            git checkout ${{ github.ref_name }}
             # Stop and remove running containers using the image
-            docker ps --filter "ancestor=$ECR_REGISTRY/${{ secrets.IMAGE_REPOSITORY }}" -q | xargs -r docker stop
-            docker ps -a --filter "ancestor=$ECR_REGISTRY/${{ secrets.IMAGE_REPOSITORY }}" -q | xargs -r docker rm
+            docker ps --filter "ancestor=$IMAGE_REPOSITORY" -q | xargs -r docker stop
+            docker ps -a --filter "ancestor=$IMAGE_REPOSITORY" -q | xargs -r docker rm
             # Pull latest image
             docker pull $FULL_IMAGE_NAME
             # Remove old images (optional, keep only latest)
@@ -114,5 +115,5 @@ jobs:
             export DOCKER_IMAGE=$FULL_IMAGE_NAME
             export REDIS_PASSWORD=$REDIS_PASSWORD
             # Run docker-compose
-            USER_UID=$$(id -u) USER_GID=$$(id -g) docker-compose -f docker-compose.nginx.yml up -d
+            USER_UID=$(id -u) USER_GID=$(id -g) docker-compose -f docker-compose.nginx.yml up -d
           '
