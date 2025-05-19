@@ -118,3 +118,4 @@ jobs:
             export REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}
             # Run docker-compose
             docker-compose -f docker-compose.nginx.yml up -d
+          '
