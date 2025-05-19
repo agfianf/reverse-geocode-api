@@ -97,6 +97,7 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no ${USER_NAME}@${HOSTNAME} '
             set -e
+            aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.IMAGE_REGISTRY }}
             # Check if project directory exists, clone if not
             if [ ! -d "${{ secrets.APP_PATH }}/.git" ]; then
               git clone https://github.com/${{ github.repository }}.git ${{ secrets.APP_PATH }}

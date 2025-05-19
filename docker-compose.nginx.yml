@@ -9,8 +9,8 @@ services:
         USER_GID: ${USER_GID:-1000}
     image: ${DOCKER_IMAGE}
     restart: unless-stopped
-    volumes:
-      - ./src:/application/src
+    # volumes:
+    #   - ./src:/application/src
     depends_on:
       database:
         condition: service_healthy
