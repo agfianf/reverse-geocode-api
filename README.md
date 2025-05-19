@@ -17,6 +17,7 @@ This API is not perfect, but it's fast and works well for most use cases! 🚀
 
 <details>
 <summary>This is comparison table for other geocoding APIs (Click to expand):</summary>
+
 | API/Service | Pros | Cons | Price (as of 2025) |
 | :-- | :-- | :-- | :-- |
 | **Google Maps** | - Industry-leading accuracy (often within 10m) | - Complex, non-linear pricing | \$5.00 per 1,000 requests |
