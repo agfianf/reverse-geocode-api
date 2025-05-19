@@ -73,3 +73,48 @@ jobs:
           ignore-unfixed: true
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
+    outputs:
+      ecr_registry: ${{ steps.login-ecr.outputs.registry }}
+
+  deploy:
+    name: Deploy to AWS ECS
+    runs-on: ubuntu-latest
+    needs: build
+    env:
+      ECR_REGISTRY: ${{ needs.build.outputs.ecr_registry }}
+    if: (github.event_name == 'push' && (startsWith(github.ref, 'refs/tags/stg-v') || startsWith(github.ref, 'refs/tags/prod-v')))
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🚀 Deploy to EC2 via SSH
+        env:
+            PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+            HOSTNAME: ${{ secrets.SSH_HOST }}
+            USER_NAME: ${{ secrets.SSH_USER_NAME }}
+        run: |
+          echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
+          ssh -o StrictHostKeyChecking=no -i private_key ${USER_NAME}@${HOSTNAME} '
+            set -e
+            # Check if project directory exists, clone if not
+            if [ ! -d "${{ secrets.APP_PATH }}/.git" ]; then
+              git clone ${{ github.repositoryUrl }} ${{ secrets.APP_PATH }}
+            fi
+            cd ${{ secrets.APP_PATH }}
+            git fetch --all --tags
+            git checkout ${{ github.ref_name }}
+            git pull
+            # Stop and remove running containers using the image
+            docker ps --filter "ancestor=$ECR_REGISTRY/${{ secrets.REPO_NAME }}:${{ github.ref_name }}" -q | xargs -r docker stop
+            docker ps -a --filter "ancestor=$ECR_REGISTRY/${{ secrets.REPO_NAME }}:${{ github.ref_name }}" -q | xargs -r docker rm
+            # Pull latest changes
+            git pull
+            # Pull latest image
+            docker pull $ECR_REGISTRY/${{ secrets.REPO_NAME }}:${{ github.ref_name }}
+            # Remove old images (optional, keep only latest)
+            docker image prune -f
+            # Set env vars and run docker-compose.nginx.yml via Makefile
+            export DOCKER_IMAGE=$ECR_REGISTRY/${{ secrets.REPO_NAME }}:${{ github.ref_name }}
+            export REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}
+            # Run docker-compose
+            docker-compose -f docker-compose.nginx.yml up -d
