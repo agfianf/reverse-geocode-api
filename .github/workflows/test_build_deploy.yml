@@ -1,4 +1,4 @@
-name: Test
+name: Test, Build, and Push ECR Image
 on:
   pull_request:
     branches: [ main ]
