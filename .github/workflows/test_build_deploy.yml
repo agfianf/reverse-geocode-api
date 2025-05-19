@@ -2,10 +2,18 @@ name: Test, Build, and Push ECR Image
 on:
   pull_request:
     branches: [ main ]
+    paths-ignore:
+      - '**/*.png'
+      - '**/*.gif'
+      - '**/*.md'
   push:
     tags:
       - stg-v*
       - prod-v*
+    paths-ignore:
+      - '**/*.png'
+      - '**/*.gif'
+      - '**/*.md'
 
 jobs:
   test:
