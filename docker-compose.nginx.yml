@@ -1,44 +1,41 @@
 version: "3.9"
-services:
-  app-base: &app-base
-    build:
-      context: .
-      dockerfile: Dockerfile.dev
-      args:
-        USER_UID: ${USER_UID:-1000}
-        USER_GID: ${USER_GID:-1000}
-    image: ${DOCKER_IMAGE}
-    restart: unless-stopped
-    env_file:
-      - src/app/.env
-    environment:
-      - REDIS_PASSWORD=${REDIS_PASSWORD:-your_redis_password}
-      - APP_VERSION=${APP_VERSION:-latest}
-      - APP_ENV=${APP_ENV:-dev}
-    depends_on:
-      database:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-    networks:
-      - reverse-geo
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080"]
-      interval: 5s
-      timeout: 3s
-      retries: 3
 
+x-app-base: &app-base
+  build:
+    context: .
+    dockerfile: Dockerfile.dev
+    args:
+      USER_UID: ${USER_UID:-1000}
+      USER_GID: ${USER_GID:-1000}
+  image: ${DOCKER_IMAGE}
+  restart: unless-stopped
+  env_file:
+    - src/app/.env
+  environment:
+    - REDIS_PASSWORD=${REDIS_PASSWORD:-your_redis_password}
+    - APP_VERSION=${APP_VERSION:-latest}
+    - APP_ENV=${APP_ENV:-dev}
+  depends_on:
+    database:
+      condition: service_healthy
+    redis:
+      condition: service_healthy
+  networks:
+    - reverse-geo
+  healthcheck:
+    test: ["CMD", "curl", "-f", "http://localhost:8080"]
+    interval: 5s
+    timeout: 3s
+    retries: 3
+
+services:
   app1:
     <<: *app-base
     container_name: app1-geo
-    ports:
-      - 8081:8080
 
   app2:
     <<: *app-base
     container_name: app2-geo
-    ports:
-      - 8082:8080
 
   nginx:
     image: nginx:latest
