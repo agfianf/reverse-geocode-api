@@ -14,7 +14,9 @@ Reverse Geocode is an API that takes latitude and longitude as input and returns
 We built this because sometimes you need to geocode `at high speed (> 1 req/second)` for Indonesian locations.
 This API is not perfect, but it's fast and works well for most use cases! 🚀
 
-This is comparison table for other geocoding APIs:
+
+<details>
+<summary>This is comparison table for other geocoding APIs (Click to expand):</summary>
 | API/Service | Pros | Cons | Price (as of 2025) |
 | :-- | :-- | :-- | :-- |
 | **Google Maps** | - Industry-leading accuracy (often within 10m) | - Complex, non-linear pricing | \$5.00 per 1,000 requests |
@@ -35,7 +37,7 @@ This is comparison table for other geocoding APIs:
 |  | - Easy to use, supports both forward/reverse geocode | - Not as feature-rich as Google |  |
 | **MapQuest** | - Free tier (15,000/month), strong US data | - Attribution required, limited batch support | Free tier; paid plans available |
 |  | - Good for US-focused apps | - Less competitive outside North America |  |
-
+</details>
 
 ---
 
