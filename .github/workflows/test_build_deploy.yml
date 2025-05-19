@@ -93,7 +93,7 @@ jobs:
             HOSTNAME: ${{ secrets.SSH_HOST }}
             USER_NAME: ${{ secrets.SSH_USER_NAME }}
         run: |
-          echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
+          echo "$SSH_PRIVATE_KEY" > private_key && chmod 600 private_key
           ssh -o StrictHostKeyChecking=no -i private_key ${USER_NAME}@${HOSTNAME} '
             set -e
             # Check if project directory exists, clone if not
