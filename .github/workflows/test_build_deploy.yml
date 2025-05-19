@@ -1,0 +1,133 @@
+name: Test, Build, and Push ECR Image
+on:
+  pull_request:
+    branches: [ main ]
+    paths-ignore:
+      - '**/*.png'
+      - '**/*.gif'
+      - '**/*.md'
+  push:
+    tags:
+      - stg-v*
+      - prod-v*
+    paths-ignore:
+      - '**/*.png'
+      - '**/*.gif'
+      - '**/*.md'
+
+jobs:
+  test:
+    name: Test, Lint, and Format
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🐍 Install uv and set the python version
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
+          python-version: "3.12"
+
+      - name: 📦 Install the project
+        run: make install
+
+      - name: 🔍 Checking linter
+        run: make lint
+
+      - name: 🔍 Checking Format
+        run: make format
+
+      - name: 📊 Run tests with Coverage
+        run: make test
+
+  build:
+    name: Build and Push ECR Image
+    runs-on: ubuntu-latest
+    needs: test
+    if: (github.event_name == 'push' && (startsWith(github.ref, 'refs/tags/stg-v') || startsWith(github.ref, 'refs/tags/prod-v')))
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build, tag, and push the image to Amazon ECR
+        id: build-image
+        env:
+          ECR_REGISTRY: ${{ secrets.IMAGE_REGISTRY }}
+          ECR_REPOSITORY: ${{ secrets.IMAGE_REPOSITORY }}
+          IMAGE_TAG: ${{ github.ref_name }}
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@0.30.0
+        with:
+          image-ref: ${{ secrets.IMAGE_REGISTRY }}/${{ secrets.IMAGE_REPOSITORY }}:${{ github.ref_name }}
+          format: 'table'
+          exit-code: '0'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
+  deploy:
+    name: Deploy to AWS ECS
+    runs-on: ubuntu-latest
+    needs: build
+    if: (github.event_name == 'push' && (startsWith(github.ref, 'refs/tags/stg-v') || startsWith(github.ref, 'refs/tags/prod-v')))
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: ⛓️ Setup SSH Agent and Key
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: 🚀 Deploy to EC2 via SSH
+        env:
+            HOSTNAME: ${{ secrets.SSH_HOST }}
+            USER_NAME: ${{ secrets.SSH_USER_NAME }}
+            REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
+            FULL_IMAGE_NAME: ${{ secrets.IMAGE_REGISTRY }}/${{ secrets.IMAGE_REPOSITORY }}:${{ github.ref_name }}
+            IMAGE_REPOSITORY: ${{ secrets.IMAGE_REGISTRY }}/${{ secrets.IMAGE_REPOSITORY }}
+            APP_VERSION: ${{ github.ref_name }}
+            APP_ENV: "staging"
+        run: |
+          ssh -o StrictHostKeyChecking=no ${USER_NAME}@${HOSTNAME} "
+            set -e
+            aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.IMAGE_REGISTRY }}
+            # Check if project directory exists, clone if not
+            if [ ! -d "${{ secrets.APP_PATH }}/.git" ]; then
+              git clone https://github.com/${{ github.repository }}.git ${{ secrets.APP_PATH }}
+            fi
+            cd ${{ secrets.APP_PATH }}
+            docker-compose -f docker-compose.nginx.yml down
+            git fetch --all --tags
+            git checkout ${{ github.ref_name }}
+            # Stop and remove running containers using the image
+            docker ps --filter 'ancestor=${IMAGE_REPOSITORY}' -q | xargs -r docker stop
+            docker ps -a --filter 'ancestor=${IMAGE_REPOSITORY}' -q | xargs -r docker rm
+            # Pull latest image
+            docker pull ${FULL_IMAGE_NAME}
+            # Remove old images (optional, keep only latest)
+            docker image prune -f
+            # Set env vars and run docker-compose.nginx.yml via Makefile
+            export DOCKER_IMAGE=${FULL_IMAGE_NAME}
+            export REDIS_PASSWORD=${REDIS_PASSWORD}
+            export APP_VERSION=${APP_VERSION}
+            export APP_ENV=${APP_ENV}
+            # Run docker-compose
+            USER_UID=\$(id -u) USER_GID=\$(id -g) docker-compose -f docker-compose.nginx.yml up -d
+          "

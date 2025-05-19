@@ -35,6 +35,16 @@ make up-nginx
 - Access the API at [http://localhost/](http://localhost/) (port 80).
 - Swagger UI is available at `/docs`.
 
+![app-arch](./assets/app-arch.gif)
+
+---
+
+## [Deploy to AWS via Github Actions CI/CD](./docs/deployment.md)
+
+![image](./assets/deployment/overview.gif)
+
+[Readmore Here](./docs/deployment.md)
+
 ---
 
 ## 🧑‍💻 Tech Stack
@@ -70,6 +80,6 @@ To convert the shapefile to SQL, check out [`docs/database/convert.py`](docs/dat
 ## 📋 To Do
 
 - [x] Add caching
-- [ ] Add CI/CD
-- [ ] Add more tests
-- [ ] Add more documentation
+- [x] Add CI/CD
+- [x] Add more tests
+- [x] Add more documentation
